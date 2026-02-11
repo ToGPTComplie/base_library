@@ -16,6 +16,12 @@ public class Result<T> {
         this.code = resultCode.getCode();
         this.message = resultCode.getMessage();
     }
+    
+    Result(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public static <T> Result<T> success() {
         return new Result<T>(ResultCode.SUCCESS);
     }
@@ -40,14 +46,18 @@ public class Result<T> {
         return new Result<>(resultCode);
     }
 
-    public static <T> Result<T> error(ResultCode resultCode, String message) {
-        Result<T> result = new Result<>(resultCode);
-        result.setMessage(message);
+    public static <T> Result<T> error(ResultCode resultCode, T data) {
+        Result<T> result = new Result<T>(resultCode);
+        result.data = data;
         return result;
     }
 
-    public static <T> Result<T> error(ResultCode resultCode, T data) {
-        Result<T> result = new Result<T>(resultCode);
+    public static <T> Result<T> error(Integer code, String message) {
+        return new Result<>(code, message);
+    }
+
+    public static <T> Result<T> error(Integer code, String message, T data) {
+        Result<T> result = new Result<T>(code, message);
         result.data = data;
         return result;
     }

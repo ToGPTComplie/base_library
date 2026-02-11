@@ -10,11 +10,12 @@ public class AuthException extends RuntimeException {
     private ResultCode resultCode;
 
     public AuthException(ResultCode resultCode) {
+        super(resultCode.getMessage());
         this.resultCode = resultCode;
-        this.detailMessage = resultCode.getMessage();
     }
 
     public AuthException(ResultCode resultCode, String detailMessage) {
+        super(resultCode.getMessage() + ": " + detailMessage);
         this.resultCode = resultCode;
         this.detailMessage = detailMessage;
     }
