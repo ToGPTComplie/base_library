@@ -31,6 +31,12 @@ public class Result<T> {
         result.data = data;
         return result;
     }
+    public static <T> Result<T> success(String message, T data) {
+        Result<T> result = new Result<T>(ResultCode.SUCCESS);
+        result.message = message;
+        result.data = data;
+        return result;
+    }
 
     public static <T> Result<T> error() {
         return new Result<T>(ResultCode.FAILED);

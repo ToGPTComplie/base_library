@@ -1,6 +1,7 @@
 package com.example.library.service.auth.impl;
 
 import com.example.library.common.ResultCode;
+import com.example.library.dto.UserLoginRequest;
 import com.example.library.dto.UserRegisterRequest;
 import com.example.library.entity.User;
 import com.example.library.exception.AuthException;
@@ -8,8 +9,17 @@ import com.example.library.exception.CommonException;
 import com.example.library.mapper.UserMapper;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.auth.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public void register(UserRegisterRequest userRegisterRequest) {
@@ -61,5 +72,17 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
-    
+    @Override
+    public void login(UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
+        UsernamePasswordAuthenticationToken unauthenticatedToken = new UsernamePasswordAuthenticationToken(userLoginRequest.getUsername(), userLoginRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        HttpSession session = httpServletRequest.getSession();
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+    }
+
+
 }
