@@ -9,6 +9,8 @@ import com.example.library.exception.CommonException;
 import com.example.library.mapper.UserMapper;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.auth.AuthService;
+import com.example.library.util.JwtUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void register(UserRegisterRequest userRegisterRequest) {
@@ -73,15 +76,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void login(UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
+    public String login(UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
         UsernamePasswordAuthenticationToken unauthenticatedToken = new UsernamePasswordAuthenticationToken(userLoginRequest.getUsername(), userLoginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
-        SecurityContextHolder.setContext(securityContext);
 
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+        return jwtUtil.generateToken(authentication.getName());
     }
 
 

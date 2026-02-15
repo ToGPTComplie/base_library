@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
-        authService.login(userLoginRequest, httpServletRequest);
-        return Result.success(userLoginRequest.getUsername()+"登录成功", null);
+        String token = authService.login(userLoginRequest, httpServletRequest);
+        return Result.success(userLoginRequest.getUsername()+"登录成功", token);
     }
 }
