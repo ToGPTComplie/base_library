@@ -1,14 +1,20 @@
 package com.example.library.service.auth.impl;
 
+import com.example.library.common.Result;
 import com.example.library.common.ResultCode;
+import com.example.library.dto.TokenRefreshResponse;
 import com.example.library.dto.UserLoginRequest;
 import com.example.library.dto.UserRegisterRequest;
+import com.example.library.entity.RefreshToken;
 import com.example.library.entity.User;
 import com.example.library.exception.AuthException;
 import com.example.library.exception.CommonException;
 import com.example.library.mapper.UserMapper;
 import com.example.library.repository.UserRepository;
+import com.example.library.security.CustomUserDetails;
 import com.example.library.service.auth.AuthService;
+import com.example.library.service.auth.RefreshTokenService;
+import com.example.library.util.DeviceIdResolver;
 import com.example.library.util.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
+    private final DeviceIdResolver deviceIdResolver;
 
     @Override
     public void register(UserRegisterRequest userRegisterRequest) {
@@ -76,14 +84,23 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
+    public TokenRefreshResponse login(UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest) {
         UsernamePasswordAuthenticationToken unauthenticatedToken = new UsernamePasswordAuthenticationToken(userLoginRequest.getUsername(), userLoginRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(unauthenticatedToken);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
 
-        return jwtUtil.generateToken(authentication.getName());
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        String accessToken = jwtUtil.generateToken(userDetails.getUsername());
+
+        String deviceId = deviceIdResolver.resolveDeviceId(httpServletRequest);
+        String refreshToken = refreshTokenService.createRefreshToken(userDetails.getUserId(), deviceId).getToken();
+
+        return new TokenRefreshResponse(accessToken, refreshToken);
+
     }
+
 
 
 }
