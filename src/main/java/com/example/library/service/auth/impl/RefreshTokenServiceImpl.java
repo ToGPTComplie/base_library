@@ -77,7 +77,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .map(oldToken -> {
                     User user = oldToken.getUser();
                     if (deviceId != null && !deviceId.isBlank()) {
-                        if (oldToken.getDeviceId() == null || !oldToken.getDeviceId().equals(deviceId)) {
+                        // 仅当旧 Token 已绑定设备且与当前设备不一致时，才抛出异常
+                        if (oldToken.getDeviceId() != null && !oldToken.getDeviceId().equals(deviceId)) {
                             throw new RuntimeException("Refresh token device mismatch");
                         }
                     }
