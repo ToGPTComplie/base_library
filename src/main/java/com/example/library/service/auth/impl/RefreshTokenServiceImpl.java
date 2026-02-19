@@ -43,6 +43,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             {
                 if (deviceId != null && !deviceId.isBlank()) {
                     refreshTokenRepository.deleteByUserAndDeviceId(user, deviceId);
+                    refreshTokenRepository.flush(); // Force delete to execute before insert
                 }
                 refreshToken.setUser(user);
                 refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));

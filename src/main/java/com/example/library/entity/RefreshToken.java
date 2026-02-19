@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "refresh_tokens")
+@Table(name = "refresh_tokens", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "device_id"}, name = "UK_user_device")
+})
 @Data
 @NoArgsConstructor
 public class RefreshToken {
