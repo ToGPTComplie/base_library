@@ -14,7 +14,9 @@ public enum ResultCode {
     FORBIDDEN(403, "没有相关权限"),
 
     USER_ALREADY_EXIST(1001, "用户已存在"),
-    USER_NOT_FOUND(1002, "用户不存在");
+    USER_NOT_FOUND(1002, "用户不存在"),
+
+    BOOK_ALREADY_EXIST(40001,"图书已经存在");
 
     private final Integer code;
     private final String message;

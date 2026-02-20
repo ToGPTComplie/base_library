@@ -1,6 +1,7 @@
 package com.example.library.config;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
+@ConditionalOnProperty(name = "app.db-cleanup.enabled", havingValue = "true", matchIfMissing = false)
 public class DatabaseCleanup {
 
     @Bean
@@ -35,7 +37,7 @@ public class DatabaseCleanup {
                 if (e.getMessage().contains("Duplicate key name")) {
                      log.info("Constraint UK_user_device already exists.");
                 } else {
-                    log.error("Failed to add constraint UK_user_device: {}", e.getMessage());
+                    log.warn("Failed to add constraint UK_user_device: {}", e.getMessage());
                 }
             }
         };
