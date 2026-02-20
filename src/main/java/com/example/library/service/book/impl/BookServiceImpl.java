@@ -5,9 +5,11 @@ import com.example.library.dto.BookAddRequest;
 import com.example.library.dto.BookSearchResponse;
 import com.example.library.entity.Book;
 import com.example.library.exception.CommonException;
+import com.example.library.mapper.BookMapper;
 import com.example.library.repository.BookRepository;
 import com.example.library.service.book.BookService;
 
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

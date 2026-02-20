@@ -2,7 +2,6 @@ package com.example.library.service.book;
 
 import com.example.library.dto.BookAddRequest;
 import com.example.library.dto.BookSearchResponse;
-import com.example.library.entity.Book;
 
 import java.util.List;
 
