@@ -22,4 +22,6 @@ public class UserRegisterRequest {
     private String mobile;
 
     private String nickname;
+
+    private String adminKey;
 }

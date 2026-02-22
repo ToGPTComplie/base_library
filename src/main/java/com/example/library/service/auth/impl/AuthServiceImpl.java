@@ -20,6 +20,7 @@ import com.example.library.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,6 +46,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final DeviceIdResolver deviceIdResolver;
+
+    @Value("${auth.admin-key}")
+    private String adminKey;
 
     @Override
     public void register(UserRegisterRequest userRegisterRequest) {
@@ -79,6 +83,12 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(userRegisterRequest.getEmail());
         user.setMobile(userRegisterRequest.getMobile());
         user.setNickname(userRegisterRequest.getNickname());
+        if (userRegisterRequest.getAdminKey() != null && userRegisterRequest.getAdminKey().equals(adminKey)) {
+            user.setRole("ADMIN");
+        } else {
+            user.setRole("USER");
+        }
+
 
         userRepository.save(user);
     }

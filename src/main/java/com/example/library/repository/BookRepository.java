@@ -4,6 +4,9 @@ import com.example.library.entity.Book;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +22,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByAuthorContaining(String author);
 
-    List<Book> findByBookTitleContainingOrAuthorContaining(String bookTitle, String author);
+    @Query("SELECT b FROM Book b WHERE b.bookTitle LIKE %:keyword% OR b.author LIKE %:keyword%")
+    List<Book> findByBookTitleContainingOrAuthorContaining(@Param("keyword") String keyword);
 }

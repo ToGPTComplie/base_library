@@ -46,7 +46,10 @@ public class BookServiceImpl implements BookService {
         if (keyword == null || keyword.isBlank()) {
             return List.of();
         }
-        return bookRepository.findByBookTitleContainingOrAuthorContaining(keyword, keyword).stream().map(bookMapper::toBookSearchResponse).toList();
+        // 使用新的查询方法，只传一个参数
+        return bookRepository.findByBookTitleContainingOrAuthorContaining(keyword).stream()
+                .map(bookMapper::toBookSearchResponse)
+                .toList();
     }
 
     @Override

@@ -22,7 +22,10 @@ export const searchBooks = async (keyword?: string): Promise<BookSearchResponse[
     const response = await api.get('/books/search', {
         params: { keyword }
     });
-    return response.data.data;
+    if (response.data.code && response.data.code !== 200) {
+        throw new Error(response.data.message || 'Search failed');
+    }
+    return response.data.data || [];
 };
 
 export const addBook = async (book: BookAddRequest): Promise<void> => {

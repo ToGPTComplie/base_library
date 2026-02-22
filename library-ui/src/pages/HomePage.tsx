@@ -13,7 +13,9 @@ import {
     TableHead, 
     TableRow,
     InputAdornment,
-    Chip
+    Chip,
+    Alert,
+    Snackbar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
@@ -27,13 +29,18 @@ const HomePage: React.FC = () => {
     const [books, setBooks] = useState<BookSearchResponse[]>([]);
     const [keyword, setKeyword] = useState('');
     const [openAddDialog, setOpenAddDialog] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchBooks = useCallback(async () => {
+        setError(null);
         try {
             const data = await searchBooks(keyword);
             setBooks(data);
-        } catch (error) {
-            console.error("Failed to fetch books", error);
+        } catch (err: any) {
+            console.error("Failed to fetch books", err);
+            // 尝试从 API 响应中获取错误信息
+            const message = err.response?.data?.message || err.message || "Failed to fetch books";
+            setError(message);
         }
     }, [keyword]);
 
@@ -90,6 +97,12 @@ const HomePage: React.FC = () => {
                     </Button>
                 </Box>
             </Box>
+
+            {error && (
+                <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
 
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <TextField

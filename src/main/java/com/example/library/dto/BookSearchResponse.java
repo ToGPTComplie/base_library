@@ -5,9 +5,13 @@ import com.example.library.entity.Book;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookSearchResponse {
     @NotBlank
     @Size(max = 20)
@@ -27,15 +31,4 @@ public class BookSearchResponse {
     @Min(value = 0, message = "可用库存不能小于0")
 
     private Integer availableStock;
-
-    public BookSearchResponse(Book book){
-        if (book == null) {
-            throw new IllegalArgumentException("Book object cannot be null");
-        }
-        this.isbn = book.getIsbn();
-        this.bookTitle = book.getBookTitle();
-        this.author = book.getAuthor();
-        this.category = book.getCategory();
-        this.availableStock = book.getAvailableStock();
-    }
 }

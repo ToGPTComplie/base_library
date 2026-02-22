@@ -18,6 +18,7 @@ const RegisterPage: React.FC = () => {
             mobile: '',
             email: '',
             nickname: '',
+            adminKey: '',
         },
         validationSchema: Yup.object({
             username: Yup.string()
@@ -38,6 +39,7 @@ const RegisterPage: React.FC = () => {
                 .required('Email is required'),
             nickname: Yup.string()
                 .required('Nickname is required'),
+            adminKey: Yup.string(),
         }),
         onSubmit: async (values) => {
             setError(null);
@@ -158,9 +160,22 @@ const RegisterPage: React.FC = () => {
                         onBlur={formik.handleBlur}
                         error={formik.touched.nickname && Boolean(formik.errors.nickname)}
                         helperText={formik.touched.nickname && formik.errors.nickname}
-                    />
-                    <Button
-                        type="submit"
+                />
+                <TextField
+                    margin="normal"
+                    fullWidth
+                    id="adminKey"
+                    label="Admin Key (Optional)"
+                    name="adminKey"
+                    autoComplete="off"
+                    value={formik.values.adminKey}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.adminKey && Boolean(formik.errors.adminKey)}
+                    helperText={formik.touched.adminKey && formik.errors.adminKey}
+                />
+                <Button
+                    type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
