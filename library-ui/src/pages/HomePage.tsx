@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { 
     Container, 
     Typography, 
@@ -18,15 +18,24 @@ import {
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { BookSearchResponse, searchBooks } from '../services/BookService';
+import { type BookSearchResponse, searchBooks } from '../services/BookService';
 import AddBookDialog from '../components/AddBookDialog';
 
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<{ username: string } | null>(null);
     const [books, setBooks] = useState<BookSearchResponse[]>([]);
     const [keyword, setKeyword] = useState('');
     const [openAddDialog, setOpenAddDialog] = useState(false);
+
+    const fetchBooks = useCallback(async () => {
+        try {
+            const data = await searchBooks(keyword);
+            setBooks(data);
+        } catch (error) {
+            console.error("Failed to fetch books", error);
+        }
+    }, [keyword]);
 
     useEffect(() => {
         const token = localStorage.getItem('access_token');
@@ -35,31 +44,21 @@ const HomePage: React.FC = () => {
         } else {
             // Mock user, or decode JWT
             setUser({ username: 'Reader' });
-            fetchBooks();
+            // fetchBooks will be called by the debounce effect
         }
     }, [navigate]);
 
-    const fetchBooks = async () => {
-        try {
-            const data = await searchBooks(keyword);
-            setBooks(data);
-        } catch (error) {
-            console.error("Failed to fetch books", error);
-        }
-    };
-
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setKeyword(e.target.value);
-        // In real app, debounce this
     };
 
-    // Trigger search when keyword changes (simple implementation)
+    // Trigger search when keyword changes
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchBooks();
         }, 300); // 300ms debounce
         return () => clearTimeout(timer);
-    }, [keyword]);
+    }, [fetchBooks]);
 
     const handleLogout = () => {
         localStorage.removeItem('access_token');
@@ -70,9 +69,12 @@ const HomePage: React.FC = () => {
     return (
         <Container component="main" maxWidth="lg">
             <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4" component="h1">
-                    Library Inventory
-                </Typography>
+                <Box>
+                    <Typography variant="h4" component="h1">
+                        Library Inventory
+                    </Typography>
+                    {user && <Typography variant="subtitle1" color="textSecondary">Welcome, {user.username}</Typography>}
+                </Box>
                 <Box>
                      <Button variant="outlined" color="secondary" onClick={handleLogout} sx={{ mr: 2 }}>
                         Logout

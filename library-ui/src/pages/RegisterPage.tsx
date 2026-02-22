@@ -43,14 +43,17 @@ const RegisterPage: React.FC = () => {
             setError(null);
             try {
                 // Remove confirmPassword before sending to API
-                const { confirmPassword, ...registerData } = values;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { confirmPassword: _, ...registerData } = values;
                 await api.post('/auth/register', registerData);
                 setSuccess(true);
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            } catch (err: unknown) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const error = err as any;
+                setError(error.response?.data?.message || 'Registration failed. Please try again.');
             }
         },
     });

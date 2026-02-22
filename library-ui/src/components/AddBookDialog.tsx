@@ -9,7 +9,7 @@ import {
     Grid,
     Alert
 } from '@mui/material';
-import { addBook, BookAddRequest } from '../services/BookService';
+import { addBook, type BookAddRequest } from '../services/BookService';
 
 interface AddBookDialogProps {
     open: boolean;
@@ -59,8 +59,10 @@ const AddBookDialog: React.FC<AddBookDialogProps> = ({ open, onClose, onBookAdde
                 totalStock: 1,
                 availableStock: 1
             });
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to add book. Only admins can do this.');
+        } catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const error = err as any;
+            setError(error.response?.data?.message || 'Failed to add book. Only admins can do this.');
         }
     };
 

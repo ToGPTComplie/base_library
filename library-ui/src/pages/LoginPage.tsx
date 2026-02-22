@@ -30,8 +30,10 @@ const LoginPage: React.FC = () => {
 
                 // 跳转到首页（目前先跳到个人中心或 Dashboard，暂时用 / 代替）
                 navigate('/');
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+            } catch (err: unknown) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const error = err as any;
+                setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
             }
         },
     });
