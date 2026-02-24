@@ -1,5 +1,6 @@
 package com.example.library.task;
 
+import com.example.library.annotation.TaskLog;
 import com.example.library.repository.BorrowRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ public class OverdueCheckTask {
 
     // 每天凌晨 1:00 执行
     // cron 表达式: 秒 分 时 日 月 周
-    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     @TaskLog("检查逾期记录")
     public void checkOverdue() {
