@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import MyBooksPage from './pages/MyBooksPage';
 import { Container, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
 const theme = createTheme();
@@ -30,6 +31,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-books"
+              element={
+                <ProtectedRoute>
+                  <MyBooksPage />
                 </ProtectedRoute>
               }
             />

@@ -44,7 +44,10 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookSearchResponse> searchBooksByKeyword(String keyword) {
         if (keyword == null || keyword.isBlank()) {
-            return List.of();
+            // 如果关键词为空，返回所有书籍
+            return bookRepository.findAll().stream()
+                    .map(bookMapper::toBookSearchResponse)
+                    .toList();
         }
         // 使用新的查询方法，只传一个参数
         return bookRepository.findByBookTitleContainingOrAuthorContaining(keyword).stream()

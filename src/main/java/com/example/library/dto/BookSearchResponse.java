@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookSearchResponse {
+    private Long id;
+
     @NotBlank
     @Size(max = 20)
     private String isbn;

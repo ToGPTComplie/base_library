@@ -40,4 +40,7 @@ public class BorrowRecord {
     // 状态: 0-借出中, 1-已还, 2-逾期
     @Column(name = "status", nullable = false)
     private Integer status;
+
+    @Column(name = "renew_count", nullable = false)
+    private Integer renewCount = 0; // 默认为 0
 }

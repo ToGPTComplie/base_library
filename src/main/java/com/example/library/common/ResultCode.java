@@ -21,7 +21,10 @@ public enum ResultCode {
     BOOK_AVAILABLE_STOCK_NOT_ENOUGH(40003,"图书库存不足"),
 
     THIS_BOOK_ALREADY_BORROWED(41001,"您已借阅该书且未归还"),
-    YOU_CANT_BORROW_MORE(41002,"您已借阅了最大数量的书籍，无法借阅更多");
+    YOU_CANT_BORROW_MORE(41002,"您已借阅了最大数量的书籍，无法借阅更多"),
+    THIS_BOOK_NOT_BORROWED(41003,"您未借阅该书"),
+    RENEW_LIMIT_EXCEEDED(41004,"您已续借了最大次数，无法续借更多"),
+    BOOK_ALREADY_OVERDUE(41005,"图书已逾期，无法续借");
 
     private final Integer code;
     private final String message;

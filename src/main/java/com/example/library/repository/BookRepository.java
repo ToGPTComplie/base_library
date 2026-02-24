@@ -31,4 +31,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Modifying
     @Query("UPDATE Book b SET b.availableStock = b.availableStock - 1 WHERE b.id = :id AND b.availableStock > 0")
     int decrementStock(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Book b SET b.availableStock = b.availableStock + 1 WHERE b.id = :id")
+    int incrementStock(@Param("id") Long id);
 }

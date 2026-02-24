@@ -20,7 +20,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { type BookSearchResponse, searchBooks } from '../services/BookService';
+import BookIcon from '@mui/icons-material/MenuBook';
+import { type BookSearchResponse, searchBooks, borrowBook } from '../services/BookService';
 import AddBookDialog from '../components/AddBookDialog';
 
 const HomePage: React.FC = () => {
@@ -30,6 +31,7 @@ const HomePage: React.FC = () => {
     const [keyword, setKeyword] = useState('');
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const fetchBooks = useCallback(async () => {
         setError(null);
@@ -38,7 +40,6 @@ const HomePage: React.FC = () => {
             setBooks(data);
         } catch (err: any) {
             console.error("Failed to fetch books", err);
-            // 尝试从 API 响应中获取错误信息
             const message = err.response?.data?.message || err.message || "Failed to fetch books";
             setError(message);
         }
@@ -49,9 +50,8 @@ const HomePage: React.FC = () => {
         if (!token) {
             navigate('/login');
         } else {
-            // Mock user, or decode JWT
+            // Mock user
             setUser({ username: 'Reader' });
-            // fetchBooks will be called by the debounce effect
         }
     }, [navigate]);
 
@@ -59,11 +59,10 @@ const HomePage: React.FC = () => {
         setKeyword(e.target.value);
     };
 
-    // Trigger search when keyword changes
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchBooks();
-        }, 300); // 300ms debounce
+        }, 300);
         return () => clearTimeout(timer);
     }, [fetchBooks]);
 
@@ -71,6 +70,16 @@ const HomePage: React.FC = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         navigate('/login');
+    };
+
+    const handleBorrow = async (bookId: number) => {
+        try {
+            await borrowBook(bookId);
+            setSuccessMsg("Borrow successful!");
+            fetchBooks(); // Refresh to update stock
+        } catch (err: any) {
+            setError(err.message || "Borrow failed");
+        }
     };
 
     return (
@@ -83,10 +92,18 @@ const HomePage: React.FC = () => {
                     {user && <Typography variant="subtitle1" color="textSecondary">Welcome, {user.username}</Typography>}
                 </Box>
                 <Box>
-                     <Button variant="outlined" color="secondary" onClick={handleLogout} sx={{ mr: 2 }}>
+                    <Button 
+                        variant="contained" 
+                        color="secondary" 
+                        startIcon={<BookIcon />}
+                        onClick={() => navigate('/my-books')}
+                        sx={{ mr: 2 }}
+                    >
+                        My Books
+                    </Button>
+                    <Button variant="outlined" color="inherit" onClick={handleLogout} sx={{ mr: 2 }}>
                         Logout
                     </Button>
-                    {/* Assuming only admins can see this, but for now show to everyone, backend will block */}
                     <Button 
                         variant="contained" 
                         color="primary" 
@@ -103,6 +120,17 @@ const HomePage: React.FC = () => {
                     {error}
                 </Alert>
             )}
+            
+            <Snackbar 
+                open={!!successMsg} 
+                autoHideDuration={4000} 
+                onClose={() => setSuccessMsg(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert severity="success" onClose={() => setSuccessMsg(null)}>
+                    {successMsg}
+                </Alert>
+            </Snackbar>
 
             <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
                 <TextField
@@ -129,7 +157,7 @@ const HomePage: React.FC = () => {
                             <TableCell>Title</TableCell>
                             <TableCell>Author</TableCell>
                             <TableCell>Category</TableCell>
-                            <TableCell align="right">Available / Total</TableCell>
+                            <TableCell align="right">Available</TableCell>
                             <TableCell align="center">Status</TableCell>
                             <TableCell align="center">Action</TableCell>
                         </TableRow>
@@ -138,7 +166,7 @@ const HomePage: React.FC = () => {
                         {books.length > 0 ? (
                             books.map((book) => (
                                 <TableRow
-                                    key={book.isbn}
+                                    key={book.id || book.isbn}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
@@ -148,7 +176,7 @@ const HomePage: React.FC = () => {
                                     <TableCell>{book.author}</TableCell>
                                     <TableCell>{book.category || '-'}</TableCell>
                                     <TableCell align="right">
-                                        {book.availableStock} / {book.availableStock} {/* Note: Response might not have totalStock if strict DTO */}
+                                        {book.availableStock}
                                     </TableCell>
                                     <TableCell align="center">
                                         <Chip 
@@ -161,7 +189,9 @@ const HomePage: React.FC = () => {
                                         <Button 
                                             size="small" 
                                             disabled={book.availableStock <= 0}
-                                            variant="outlined"
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleBorrow(book.id)}
                                         >
                                             Borrow
                                         </Button>
